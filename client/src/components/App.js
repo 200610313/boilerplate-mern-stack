@@ -1,12 +1,14 @@
-import React, { Suspense } from 'react';
-import { Route, Switch } from "react-router-dom";
-import Auth from "../hoc/auth";
+import React, { Suspense } from "react"
+import { Route, Switch } from "react-router-dom"
+import Auth from "../hoc/auth"
 // pages for this product
-import LandingPage from "./views/LandingPage/LandingPage.js";
-import LoginPage from "./views/LoginPage/LoginPage.js";
-import RegisterPage from "./views/RegisterPage/RegisterPage.js";
-import NavBar from "./views/NavBar/NavBar";
+import LandingPage from "./views/LandingPage/LandingPage.js"
+import LoginPage from "./views/LoginPage/LoginPage.js"
+// import RegisterPage from "./views/RegisterPage/RegisterPage.js";
 import Footer from "./views/Footer/Footer"
+import SignInPage from "./views/SignInPage/SignInPage"
+import SignUpPage from "./views/SignUpPage/SignUpPage"
+// import RegisterPage from "./views/RegisterPage/RegisterPage"
 
 //null   Anyone Can go inside
 //true   only logged in user can go inside
@@ -14,18 +16,15 @@ import Footer from "./views/Footer/Footer"
 
 function App() {
   return (
-    <Suspense fallback={(<div>Loading...</div>)}>
-      <NavBar />
-      <div style={{ paddingTop: '69px', minHeight: 'calc(100vh - 80px)' }}>
-        <Switch>
-          <Route exact path="/" component={Auth(LandingPage, null)} />
-          <Route exact path="/login" component={Auth(LoginPage, false)} />
-          <Route exact path="/register" component={Auth(RegisterPage, false)} />
-        </Switch>
-      </div>
-      <Footer />
-    </Suspense>
-  );
+    <>
+      <Switch>
+        <Route exact path="/" component={Auth(LandingPage, true)} />
+        <Route exact path="/signin" component={Auth(SignInPage, false)} />
+        <Route exact path="/signup" component={Auth(SignUpPage, false)} />
+        <Route exact component={Auth(LandingPage, true)} />
+      </Switch>
+    </>
+  )
 }
 
-export default App;
+export default App
