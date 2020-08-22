@@ -76,6 +76,12 @@ userSchema.methods.generateToken = function (cb) {
   })
 }
 
+userSchema.statics.emailExists = async function (emailToCheck) {
+  var user = this
+  const existingUser = await user.findOne({ email: emailToCheck })
+  return existingUser ? true : false
+}
+
 userSchema.statics.findByToken = function (token, cb) {
   var user = this
 

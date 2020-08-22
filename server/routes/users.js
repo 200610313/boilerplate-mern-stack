@@ -1,9 +1,17 @@
 const express = require("express")
 const router = express.Router()
 const { User } = require("../models/User")
-const 
 const { auth } = require("../middleware/auth")
-const { body } = require("express-validator")
+const { body, validationResult } = require("express-validator")
+
+// ERROR FORMATTER
+function errorFormatter({ location, msg, param, value, nestedErrors }) {
+  return `${msg}`
+}
+const getFormattedErrors = (req) =>
+  validationResult(req).formatWith(errorFormatter)
+
+const getErrors = (req) => validationResult(req)
 
 //=================================
 //             User
@@ -25,23 +33,47 @@ router.get("/auth", auth, (req, res) => {
   })
 })
 
-router.post("/register",[
+router.post(
+  "/register",
+  [
+    body([
+      "fName",
+      "lName",
+      "mInit",
+      "nickName",
+      "email",
+      "password",
+    ]).notEmpty(),
+    body(["fName", "lName", "mInit"]).isAlpha(),
+    body(["email"])
+      .custom(async (value) => {
+        console.log("HEYEYY")
+        const emailExists = await User.emailExists(value)
+        if (emailExists) return Promise.reject()
+      })
+      .withMessage("Email is taken"),
+    body(["email"]).isEmail(),
+  ],
+  (req, res) => {
+    const result = getFormattedErrors(req)
+    const errors = getErrors(req)
 
-body(['fName','lName','mInit','nickName','email','password']).notEmpty()
-body(['fName','lName','mInit','nickName','email','password']).notEmpty()
+    if (!errors.isEmpty()) {
+      console.log("errors")
+      return res.status(400).json({ errors: result.mapped() })
+    }
+    console.log("i was ehere")
 
-
-], (req, res) => {
-  const user = new User(req.body)
-
-  user.save((err, doc) => {
-    if (err) return res.json({ success: false, err })
-    return res.status(200).json({
-      success: true,
+    const user = new User(req.body)
+    user.save((err, doc) => {
+      if (err) return res.json({ success: false, err })
+      return res.status(200).json({
+        success: true,
+      })
     })
-  })
-})
-          
+  }
+)
+
 router.post("/login", (req, res) => {
   User.findOne({ email: req.body.email }, (err, user) => {
     if (!user)

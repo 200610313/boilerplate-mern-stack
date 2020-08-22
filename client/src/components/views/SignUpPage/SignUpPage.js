@@ -75,7 +75,9 @@ export default function SignUpPage({ history }) {
       const { success } = response.payload
       if (success) {
         history.push("/signin")
-      } else alert(JSON.stringify(response))
+      } else {
+        alert(JSON.stringify(response))
+      }
     } catch (error) {}
   }
 
